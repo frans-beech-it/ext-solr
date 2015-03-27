@@ -44,7 +44,7 @@ class Tx_Solr_Facet_FacetRendererFactory {
 	 *
 	 * @var string
 	 */
-	private $defaultFacetRendererClassName = 'Tx_Solr_Facet_SimpleFacetRenderer';
+	private $defaultFacetRendererClassName = 'ApacheSolrForTypo3\\Solr\\Facet\\SimpleFacetFluidRenderer';
 
 	/**
 	 * Facets configuration from plugin.tx_solr.search.faceting.facets

@@ -6,14 +6,8 @@ if (!defined ('TYPO3_MODE')) {
 $GLOBALS['PATH_solr'] = t3lib_extMgm::extPath('solr');
 
 # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- #
-
-$compatMode = FALSE;
-if (!t3lib_div::compat_version('6.0')) {
-	$compatMode = TRUE;
-	require_once($GLOBALS['PATH_solr'] . 'Compat/interface.tx_scheduler_progressprovider.php');
-}
-
-define('SOLR_COMPAT', $compatMode);
+// Todo: remove all that depends on this
+define('SOLR_COMPAT', FALSE);
 
    # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- #
 
@@ -50,6 +44,39 @@ t3lib_extMgm::addPItoST43(
 	'_pi_frequentsearches',
 	'list_type',
 	TRUE
+);
+
+\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+	'ApacheSolrForTypo3.solr',
+	'pi_result',
+	array(
+		'Search' => 'results'
+	),
+	array(
+		'Search' => 'results'
+	)
+);
+
+\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+	'ApacheSolrForTypo3.solr',
+	'pi_search',
+	array(
+		'Search' => 'form'
+	),
+	array(
+		'Search' => 'form'
+	)
+);
+
+\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+	'ApacheSolrForTypo3.solr',
+	'pi_facets',
+	array(
+		'Search' => 'frequentlySearched'
+	),
+	array(
+		'Search' => 'frequentlySearched'
+	)
 );
 
    # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- #
@@ -252,6 +279,18 @@ Tx_Solr_Facet_FacetRendererFactory::registerFacetType(
 Tx_Solr_Facet_FacetRendererFactory::registerFacetType(
 	'queryGroup',
 	'Tx_Solr_Facet_QueryGroupFacetRenderer',
+	'Tx_Solr_Query_FilterEncoder_QueryGroup',
+	'Tx_Solr_Query_FilterEncoder_QueryGroup'
+);
+
+// registering facet types
+Tx_Solr_Facet_FacetRendererFactory::registerFacetType(
+	'fluid',
+	'Partout\\Koopmans\\Solr\\FluidFacetRenderer'
+);
+Tx_Solr_Facet_FacetRendererFactory::registerFacetType(
+	'fluidQueryGroup',
+	'Partout\\Koopmans\\Solr\\FluidQueryGroupFacetRenderer',
 	'Tx_Solr_Query_FilterEncoder_QueryGroup',
 	'Tx_Solr_Query_FilterEncoder_QueryGroup'
 );

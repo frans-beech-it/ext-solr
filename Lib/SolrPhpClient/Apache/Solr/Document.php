@@ -377,10 +377,11 @@ class Apache_Solr_Document implements IteratorAggregate
 			$field = strtolower($field[0]) . substr($field, 1);
 
 			if (!isset($this->_fields[$field])) {
-				throw new RuntimeException(
-					'Tried to access non-existent field "' . $field . '".',
-					1311006894
-				);
+//				throw new RuntimeException(
+//					'Tried to access non-existent field "' . $field . '".',
+//					1311006894
+//				);
+				return NULL;
 			}
 
 			return $this->_fields[$field];

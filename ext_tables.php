@@ -61,8 +61,17 @@ $TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY . '_pi_freq
 
    # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- #
 
+// Fluid based pluginss
+\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
+	$_EXTKEY,
+	'Search',
+	'Search result - fluid'
+);
+   # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- # ----- #
+
 	// TypoScript
 t3lib_extMgm::addStaticFile($_EXTKEY, 'Configuration/TypoScript/Solr/', 'Apache Solr - Default Configuration');
+t3lib_extMgm::addStaticFile($_EXTKEY, 'Configuration/TypoScript/FluidRendering/', 'Apache Solr - Fluid rendering (include after Default Configuration)s');
 
 	// OpenSearch
 t3lib_extMgm::addStaticFile($_EXTKEY, 'Configuration/TypoScript/OpenSearch/', 'Apache Solr - OpenSearch');
