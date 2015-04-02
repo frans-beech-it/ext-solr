@@ -124,7 +124,7 @@ return array(
 	'tx_solr_resultdocumentmodifier_scoreanalyzer' => $extensionPath . 'Classes/ResultDocumentModifier/ScoreAnalyzer.php',
 	'tx_solr_resultdocumentmodifier_sitehighlighter' => $extensionPath . 'Classes/ResultDocumentModifier/SiteHighlighter.php',
 
-	'tx_solr_resultsetmodifier_lastsearches' => $extensionPath . 'Classes/ResultsetModifier/LastSearches.php',
+	'tx_solr_response_processor_lastsearches' => $extensionPath . 'Classes/Response/Processor/LastSearches.php',
 
 	'tx_solr_search_abstractcomponent' => $extensionPath . 'Classes/Search/AbstractComponent.php',
 	'tx_solr_search_accesscomponent' => $extensionPath . 'Classes/Search/AccessComponent.php',

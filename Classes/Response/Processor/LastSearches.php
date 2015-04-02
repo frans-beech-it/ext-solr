@@ -31,25 +31,56 @@
  * @package TYPO3
  * @subpackage solr
  */
-class Tx_Solr_ResultsetModifier_LastSearches implements Tx_Solr_ResultSetModifier {
+class Tx_Solr_Response_Processor_LastSearches implements Tx_Solr_ResponseProcessor {
 
+	/**
+	 * @var string
+	 */
 	protected $prefix = 'tx_solr';
+
+	/**
+	 * @var \TYPO3\CMS\Core\Database\DatabaseConnection
+	 */
+	protected $databaseConnection;
+
+	/**
+	 * @var \TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController
+	 */
+	protected $typoScriptFrontendController;
+
+	/**
+	 * @var \TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication
+	 */
+	protected $feUser;
+
+	/**
+	 * @var array
+	 */
 	protected $configuration;
 
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		// todo: fetch from ControllerContext
+		$this->configuration = Tx_Solr_Util::getSolrConfiguration();
+		$this->databaseConnection = $GLOBALS['TYPO3_DB'];
+		$this->typoScriptFrontendController = $GLOBALS['TSFE'];
+		$this->feUser = $this->typoScriptFrontendController->fe_user;
+	}
 
 	/**
 	 * Does not actually modify the result set, but tracks the search keywords.
 	 *
-	 * (non-PHPdoc)
-	 * @see Tx_Solr_ResultSetModifier::modifyResultSet()
+	 * @param Tx_Solr_Query $query
+	 * @param Apache_Solr_Response $response
 	 */
-	public function modifyResultSet(Tx_Solr_PiResults_ResultsCommand $resultCommand, array $resultSet) {
-		$this->configuration = $resultCommand->getParentPlugin()->getConfiguration();
-		$keywords = $resultCommand->getParentPlugin()->getSearch()->getQuery()->getKeywordsCleaned();
+	public function processResponse(Tx_Solr_Query $query, Apache_Solr_Response $response) {
+		$keywords = $query->getKeywordsCleaned();
 
 		$keywords = trim($keywords);
 		if(empty($keywords)) {
-			return $resultSet;
+			return;
 		}
 
 		switch ($this->configuration['search.']['lastSearches.']['mode']) {
@@ -66,7 +97,7 @@ class Tx_Solr_ResultsetModifier_LastSearches implements Tx_Solr_ResultSetModifie
 				);
 		}
 
-		return $resultSet;
+		return;
 	}
 
 	/**
@@ -76,7 +107,7 @@ class Tx_Solr_ResultsetModifier_LastSearches implements Tx_Solr_ResultSetModifie
 	 * @return	void
 	 */
 	protected function storeKeywordsToSession($keywords) {
-		$currentLastSearches = $GLOBALS['TSFE']->fe_user->getKey(
+		$currentLastSearches = $this->feUser->getKey(
 			'ses',
 			$this->prefix . '_lastSearches'
 		);
@@ -93,7 +124,7 @@ class Tx_Solr_ResultsetModifier_LastSearches implements Tx_Solr_ResultSetModifie
 			$newLastSearchesCount = count($lastSearches);
 		}
 
-		$GLOBALS['TSFE']->fe_user->setKey(
+		$this->feUser->setKey(
 			'ses',
 			$this->prefix . '_lastSearches',
 			$lastSearches
@@ -110,14 +141,14 @@ class Tx_Solr_ResultsetModifier_LastSearches implements Tx_Solr_ResultSetModifie
 		$nextSequenceId = $this->getNextSequenceId();
 
 			// TODO try to add a execREPLACEquery to t3lib_db
-		$GLOBALS['TYPO3_DB']->sql_query(
+		$this->databaseConnection->sql_query(
 			'INSERT INTO tx_solr_last_searches (sequence_id, tstamp, keywords)
 			VALUES ('
 				. $nextSequenceId . ', '
 				. time() . ', '
-				. $GLOBALS['TYPO3_DB']->fullQuoteStr($keywords, 'tx_solr_last_searches')
+				. $this->databaseConnection->fullQuoteStr($keywords, 'tx_solr_last_searches')
 			. ')
-			ON DUPLICATE KEY UPDATE tstamp = ' . time() . ', keywords = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($keywords, 'tx_solr_last_searches')
+			ON DUPLICATE KEY UPDATE tstamp = ' . time() . ', keywords = ' . $this->databaseConnection->fullQuoteStr($keywords, 'tx_solr_last_searches')
 		);
 	}
 
@@ -130,7 +161,7 @@ class Tx_Solr_ResultsetModifier_LastSearches implements Tx_Solr_ResultSetModifie
 		$nextSequenceId = 0;
 		$numberOfLastSearchesToLog = $this->configuration['search.']['lastSearches.']['limit'];
 
-		$row = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
+		$row = $this->databaseConnection->exec_SELECTgetRows(
 			'(sequence_id + 1) % ' . $numberOfLastSearchesToLog . ' as next_sequence_id',
 			'tx_solr_last_searches',
 			'',
@@ -146,10 +177,3 @@ class Tx_Solr_ResultsetModifier_LastSearches implements Tx_Solr_ResultSetModifie
 		return $nextSequenceId;
 	}
 }
-
-
-if (defined('TYPO3_MODE') && $GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/solr/Classes/query/modifier/class.Tx_Solr_Query_modifier_lastsearches.php'])	{
-	include_once($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/solr/Classes/query/modifier/class.Tx_Solr_Query_modifier_lastsearches.php']);
-}
-
-?>

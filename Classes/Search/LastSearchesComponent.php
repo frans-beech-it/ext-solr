@@ -38,15 +38,8 @@ class Tx_Solr_Search_LastSearchesComponent extends Tx_Solr_Search_AbstractCompon
 	 */
 	public function initializeSearchComponent() {
 		if($this->searchConfiguration['lastSearches']) {
-			$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr']['modifyResultSet']['lastSearches'] = 'Tx_Solr_ResultsetModifier_LastSearches';
+			$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['solr']['processSearchResponse']['lastSearches'] = 'Tx_Solr_Response_Processor_LastSearches';
 		}
 	}
 
 }
-
-
-if (defined('TYPO3_MODE') && $GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/solr/Classes/Search/LastSearchesComponent.php'])	{
-	include_once($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['ext/solr/Classes/Search/LastSearchesComponent.php']);
-}
-
-?>
