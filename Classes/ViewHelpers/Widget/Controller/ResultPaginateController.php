@@ -64,7 +64,9 @@ class ResultPaginateController extends AbstractWidgetController {
 	public function initializeAction() {
 		$this->search = $this->widgetConfiguration['search'];
 		ArrayUtility::mergeRecursiveWithOverrule($this->configuration, $this->widgetConfiguration['configuration'], FALSE);
-		$this->configuration['itemsPerPage'] = (int)$this->search->getQuery()->getResultsPerPage();
+		if ($this->search->getQuery()) {
+			$this->configuration['itemsPerPage'] = (int)$this->search->getQuery()->getResultsPerPage();
+		}
 		$this->numberOfPages = ceil($this->search->getNumberOfResults() / $this->configuration['itemsPerPage']);
 		$this->maximumNumberOfLinks = (int)$this->configuration['maximumNumberOfLinks'];
 	}
